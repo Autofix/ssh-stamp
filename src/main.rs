@@ -21,7 +21,6 @@ use ota::otatraits::OtaActions;
 use storage::flash;
 
 extern crate alloc;
-use alloc::boxed::Box;
 
 use sunset_async::{SSHServer, SunsetMutex};
 
@@ -68,7 +67,7 @@ async fn main(spawner: Spawner) -> ! {
             // applying ideas from https://github.com/brainstorm/ssh-stamp/pull/41#issuecomment-2964775170
             esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 72 * 1024);
         } else {
-                esp_alloc::heap_allocator!(size: 72 * 1024);
+            esp_alloc::heap_allocator!(size: 72 * 1024);
         }
     );
     esp_bootloader_esp_idf::esp_app_desc!();
@@ -194,7 +193,8 @@ async fn main(spawner: Spawner) -> ! {
         uart_buf,
     };
 
-    match Box::pin(peripherals_enabled(peripherals_enabled_struct)).await {
+    #[allow(clippy::large_futures)]
+    match peripherals_enabled(peripherals_enabled_struct).await {
         Ok(()) => (),
         Err(e) => {
             error!("Peripheral error: {e}");
@@ -226,7 +226,8 @@ async fn peripherals_enabled(s: SshStampInit<'static>) -> Result<(), sunset::Err
         spawner: s.spawner,
     };
 
-    match Box::pin(wifi_controller_enabled(peripherals_enabled_struct)).await {
+    #[allow(clippy::large_futures)]
+    match wifi_controller_enabled(peripherals_enabled_struct).await {
         Ok(()) => {
             debug!("Disabling wifi");
             Ok(())
@@ -260,7 +261,8 @@ pub async fn wifi_controller_enabled(s: PeripheralsEnabled<'static>) -> Result<(
         tcp_stack,
     };
 
-    match Box::pin(tcp_enabled(wifi_controller_enabled_stack)).await {
+    #[allow(clippy::large_futures)]
+    match tcp_enabled(wifi_controller_enabled_stack).await {
         Ok(()) => {
             debug!("AP Stack disabled");
             Ok(())
@@ -309,7 +311,9 @@ async fn tcp_enabled(s: WifiControllerEnabled<'_>) -> Result<(), sunset::Error> 
             tcp_socket,
             uart_buf: s.uart_buf,
         };
-        match Box::pin(socket_enabled(tcp_enabled_struct)).await {
+
+        #[allow(clippy::large_futures)]
+        match socket_enabled(tcp_enabled_struct).await {
             Ok(()) => {
                 debug!("TCP socket disabled");
             }
