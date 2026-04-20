@@ -227,12 +227,12 @@ async fn peripherals_enabled(s: SshStampInit<'static>) -> Result<(), sunset::Err
     };
 
     match Box::pin(wifi_controller_enabled(peripherals_enabled_struct)).await {
-        Ok(_) => {
+        Ok(()) => {
             debug!("Disabling wifi");
             Ok(())
         }
         Err(e) => {
-            error!("Wifi controller error: {}", e);
+            error!("Wifi controller error: {e}");
             Result::Err(e)
         }
     }
@@ -261,7 +261,7 @@ pub async fn wifi_controller_enabled(s: PeripheralsEnabled<'static>) -> Result<(
     };
 
     match Box::pin(tcp_enabled(wifi_controller_enabled_stack)).await {
-        Ok(_) => {
+        Ok(()) => {
             debug!("AP Stack disabled");
             Ok(())
         }
@@ -310,7 +310,7 @@ async fn tcp_enabled(s: WifiControllerEnabled<'_>) -> Result<(), sunset::Error> 
             uart_buf: s.uart_buf,
         };
         match Box::pin(socket_enabled(tcp_enabled_struct)).await {
-            Ok(_) => {
+            Ok(()) => {
                 debug!("TCP socket disabled");
             }
             Err(e) => {
@@ -343,12 +343,12 @@ async fn socket_enabled(s: TCPEnabled<'_>) -> Result<(), sunset::Error> {
         uart_buf: s.uart_buf,
     };
     match ssh_enabled(socket_enabled_struct).await {
-        Ok(_) => {
+        Ok(()) => {
             debug!("SSH Server disabled");
             Ok(())
         }
         Err(e) => {
-            error!("SSH server error: {}", e);
+            error!("SSH server error: {e}");
             Result::Err(e)
         }
     }
@@ -382,12 +382,12 @@ async fn ssh_enabled(s: SocketEnabled<'_>) -> Result<(), sunset::Error> {
         connection_loop: connection,
     };
     match client_connected(ssh_enabled_struct).await {
-        Ok(_) => {
+        Ok(()) => {
             debug!("Client connection disabled");
             Ok(())
         }
         Err(e) => {
-            error!("Client connection error: {}", e);
+            error!("Client connection error: {e}");
             Result::Err(e)
         }
     }
@@ -421,12 +421,12 @@ where
         tcp_socket: s.tcp_socket,
     };
     match bridge_connected(uart_enabled_struct).await {
-        Ok(_) => {
+        Ok(()) => {
             debug!("Bridge disabled");
             Ok(())
         }
         Err(e) => {
-            debug!("Bridge error: {}", e);
+            error!("Bridge error: {e}");
             Result::Err(e)
         }
     }
