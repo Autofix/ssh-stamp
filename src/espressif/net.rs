@@ -149,18 +149,6 @@ pub async fn if_up(
     Ok(ap_stack)
 }
 
-pub fn ap_stack_disable() {
-    // drop ap_stack
-    debug!("AP Stack disabled: WIP");
-    // TODO: Correctly disable/restart AP Stack and/or send messsage to user over SSH
-}
-
-pub fn tcp_socket_disable() {
-    // drop tcp stack
-    debug!("TCP socket disabled: WIP");
-    // TODO: Correctly disable/restart tcp socket and/or send messsage to user over SSH
-}
-
 pub async fn accept_requests<'a>(
     tcp_stack: Stack<'a>,
     rx_buffer: &'a mut [u8],
@@ -178,7 +166,6 @@ pub async fn accept_requests<'a>(
     {
         error!("connect error: {e:?}");
         // continue;
-        tcp_socket_disable();
     }
     debug!("Connected, port 22");
 
@@ -265,16 +252,6 @@ pub async fn wifi_up(
         }
         Timer::after(Duration::from_millis(10)).await;
     }
-}
-
-pub fn wifi_controller_disable() {
-    // TODO: Correctly disable wifi controller
-    // pub async fn wifi_disable(wifi_controller: EspWifiController<'_>) -> (){
-    // drop wifi controller
-    // esp_wifi::deinit_unchecked()
-    // wifi_controller.deinit_unchecked()
-    debug!("Disabling wifi: WIP");
-    //software_reset();
 }
 
 use esp_radio::wifi::{Config, WifiDevice};
